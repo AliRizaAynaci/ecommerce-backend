@@ -1,6 +1,8 @@
-package com.example.ecommerce.dto;
+package com.example.ecommerce.dto.response;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

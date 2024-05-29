@@ -1,14 +1,13 @@
 package com.example.ecommerce.controller;
 
-import com.example.ecommerce.dto.ProductDTO;
-import com.example.ecommerce.dto.ProductResponseDTO;
+import com.example.ecommerce.dto.request.ProductRequestDTO;
+import com.example.ecommerce.dto.response.ProductResponseDTO;
 import com.example.ecommerce.model.entity.Product;
 import com.example.ecommerce.service.interfaces.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/products")
@@ -27,14 +26,14 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductDTO productDTO) {
-        ProductResponseDTO createdProduct = productService.createProduct(productDTO);
+    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductRequestDTO productRequestDTO) {
+        ProductResponseDTO createdProduct = productService.createProduct(productRequestDTO);
         return ResponseEntity.created(URI.create("/products/" + createdProduct.getId())).body(createdProduct);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
-        ProductResponseDTO updatedProduct = productService.updateProduct(id, productDTO);
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id, @RequestBody ProductRequestDTO productRequestDTO) {
+        ProductResponseDTO updatedProduct = productService.updateProduct(id, productRequestDTO);
         return ResponseEntity.ok(updatedProduct);
     }
 

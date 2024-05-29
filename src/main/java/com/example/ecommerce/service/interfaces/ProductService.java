@@ -1,13 +1,13 @@
 package com.example.ecommerce.service.interfaces;
 
-import com.example.ecommerce.dto.ProductDTO;
-import com.example.ecommerce.dto.ProductResponseDTO;
+import com.example.ecommerce.dto.request.ProductRequestDTO;
+import com.example.ecommerce.dto.response.ProductResponseDTO;
 import com.example.ecommerce.model.entity.Product;
 
 public interface ProductService {
 
     Product getProduct(Long id);
-    ProductResponseDTO createProduct(ProductDTO productDTO);
-    ProductResponseDTO updateProduct(Long id, ProductDTO updatedProductDTO);
+    ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
+    ProductResponseDTO updateProduct(Long id, ProductRequestDTO updatedProductRequestDTO);
     void deleteProduct(Long id);
 }
