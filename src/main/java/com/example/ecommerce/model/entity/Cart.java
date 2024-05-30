@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,8 +18,8 @@ public class Cart extends BaseEntity {
 //    @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CartItem> cartItems;
+    @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
+    private List<CartItem> cartItems = new ArrayList<>();
 
     @Column(name = "total_price")
     private BigDecimal totalPrice;
