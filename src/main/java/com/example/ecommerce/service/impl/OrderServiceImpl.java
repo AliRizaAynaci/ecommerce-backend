@@ -80,6 +80,7 @@ public class OrderServiceImpl implements OrderService {
             totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
 
             product.setStock(product.getStock() - cartItem.getQuantity());
+
             productRepository.save(product);
         }
 

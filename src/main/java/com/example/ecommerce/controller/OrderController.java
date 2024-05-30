@@ -17,7 +17,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
-    @PutMapping("/{cartId}/{productId}/{quantity}")
+    @PostMapping("/{cartId}")
     public ResponseEntity<OrderResponseDTO> placeOrder(@PathVariable Long cartId) {
         OrderResponseDTO orderDTO = orderService.placeOrder(cartId);
         return ResponseEntity.ok(orderDTO);
