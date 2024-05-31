@@ -6,8 +6,6 @@ import com.example.ecommerce.dto.request.CustomerRequestDTO;
 import com.example.ecommerce.dto.request.ProductRequestDTO;
 import com.example.ecommerce.model.entity.Customer;
 import com.example.ecommerce.model.entity.Product;
-import com.example.ecommerce.repository.CustomerRepository;
-import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.interfaces.CustomerService;
 import com.example.ecommerce.service.interfaces.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +14,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Configuration
 public class DataInitializer {

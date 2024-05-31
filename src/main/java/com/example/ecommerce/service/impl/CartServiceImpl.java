@@ -100,7 +100,8 @@ public class CartServiceImpl implements CartService {
             existingItem.setQuantity(existingItem.getQuantity() + 1);
         }
 
-        recalculateTotalPrice(cart);
+        recalculateTotalPrice(cart); // Toplam fiyatı yeniden hesapla
+
         cartRepository.save(cart);
 
         CartDTO cartDTO = cartDTOConverter.convertToDto(cart);
@@ -153,21 +154,21 @@ public class CartServiceImpl implements CartService {
     }
 
     private void recalculateTotalPrice(Cart cart) {
-        BigDecimal totalPrice = cart.getTotalPrice();
-        if (totalPrice == null) {
-            totalPrice = BigDecimal.ZERO;
-        }
+        // totalPrice'ı 0 olarak başlat
+        BigDecimal totalPrice = BigDecimal.ZERO; // Başlangıç değerini sıfır yapın.
 
         for (CartItem item : cart.getCartItems()) {
             if (item.getProduct() == null || item.getQuantity() == 0) {
-                continue;
+                continue; // Null veya 0 quantity olan öğeleri atla
             }
 
             BigDecimal itemPrice = item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             totalPrice = totalPrice.add(itemPrice);
         }
-        cart.setTotalPrice(totalPrice);
+
+        cart.setTotalPrice(totalPrice); // Hesaplanan toplam fiyatı setetle
     }
+
 
     private Cart createCart(Customer customer) {
         Cart cart = new Cart();
