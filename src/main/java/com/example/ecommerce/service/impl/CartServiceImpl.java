@@ -152,7 +152,11 @@ public class CartServiceImpl implements CartService {
     }
 
     private void recalculateTotalPrice(Cart cart) {
-        BigDecimal totalPrice = BigDecimal.ZERO;
+        BigDecimal totalPrice = cart.getTotalPrice();
+        if (totalPrice == null) {
+            totalPrice = BigDecimal.ZERO;
+        }
+
         for (CartItem item : cart.getCartItems()) {
             if (item.getProduct() == null || item.getQuantity() == 0) {
                 continue;
