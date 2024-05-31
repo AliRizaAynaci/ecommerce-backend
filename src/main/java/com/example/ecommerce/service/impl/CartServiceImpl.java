@@ -3,7 +3,6 @@ package com.example.ecommerce.service.impl;
 import com.example.ecommerce.dto.converter.CartDTOConverter;
 import com.example.ecommerce.dto.converter.CartItemDtoConverter;
 import com.example.ecommerce.dto.converter.ProductDTOConverter;
-import com.example.ecommerce.dto.request.ProductRequestDTO;
 import com.example.ecommerce.dto.response.CartDTO;
 import com.example.ecommerce.dto.response.CartItemDTO;
 import com.example.ecommerce.exception.CartNotFoundException;
@@ -21,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -74,45 +75,45 @@ public class CartServiceImpl implements CartService {
 
         Cart cart = customer.getCart();
         if (cart == null) {
-            cart = new Cart();
-            cart.setCustomer(customer);
-            cart.setCartItems(new ArrayList<>());
-            cart = cartRepository.save(cart);
-            customer.setCart(cart);
-            customerRepository.save(customer);
+            cart = createCart(customer);
         }
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException(productId)); // Ensure product exists
+                .orElseThrow(() -> new ProductNotFoundException(productId));
 
-        Optional<CartItem> existingCartItem = cart.getCartItems().stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst();
+
+        boolean itemExists = cart.getCartItems().stream()
+                .anyMatch(item -> item.getProduct() != null && item.getProduct().getId().equals(productId));
 
         CartItem cartItem;
-        if (existingCartItem.isPresent()) {
-            cartItem = existingCartItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() + 1); // Increment quantity
-        } else {
+        if (!itemExists) {
             cartItem = new CartItem();
             cartItem.setCart(cart);
-            cartItem.setProduct(product); // Set the product for the new cart item
-            cartItem.setQuantity(1); // Initial quantity is 1
+            cartItem.setProduct(product);
+            cartItem.setQuantity(1);
             cart.getCartItems().add(cartItem);
+        } else {
+            CartItem existingItem = cart.getCartItems().stream()
+                    .filter(item -> item.getProduct() != null && item.getProduct().getId().equals(productId))
+                    .findFirst()
+                    .get();
+            existingItem.setQuantity(existingItem.getQuantity() + 1);
         }
 
-        recalculateTotalPrice(cart); // Recalculate total after adding or updating
-
+        recalculateTotalPrice(cart);
         cartRepository.save(cart);
 
-        // Create CartItemDTO and set productRequestDTO
-        CartItemDTO cartItemDTO = cartItemDtoConverter.convertToDto(cartItem);
-        cartItemDTO.setProduct(product);
-
         CartDTO cartDTO = cartDTOConverter.convertToDto(cart);
-        cartDTO.getCartItems().add(cartItemDTO);
+        List<CartItemDTO> filteredCartItems = cart.getCartItems().stream()
+                .filter(item -> item.getProduct() != null)
+                .map(cartItemDtoConverter::convertToDto)
+                .collect(Collectors.toList());
+        cartDTO.setCartItems(filteredCartItems);
+
         return cartDTO;
     }
+
+
 
 
 
@@ -166,5 +167,15 @@ public class CartServiceImpl implements CartService {
             totalPrice = totalPrice.add(itemPrice);
         }
         cart.setTotalPrice(totalPrice);
+    }
+
+    private Cart createCart(Customer customer) {
+        Cart cart = new Cart();
+        cart.setCustomer(customer);
+        cart.setCartItems(new ArrayList<>());
+        cart = cartRepository.save(cart);
+        customer.setCart(cart);
+        customerRepository.save(customer);
+        return cart;
     }
 }
