@@ -1,6 +1,7 @@
 package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.response.CartDTO;
+import com.example.ecommerce.model.entity.Cart;
 import com.example.ecommerce.service.interfaces.CartService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

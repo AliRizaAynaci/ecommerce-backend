@@ -19,7 +19,7 @@ public class Cart extends BaseEntity {
     private Customer customer;
 
     @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER)
-    private List<CartItem> cartItems = new ArrayList<>();
+    private List<CartItem> cartItems;
 
     @Column(name = "total_price")
     private BigDecimal totalPrice;

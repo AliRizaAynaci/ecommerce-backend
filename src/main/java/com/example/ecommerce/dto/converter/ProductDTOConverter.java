@@ -24,4 +24,9 @@ public class ProductDTOConverter {
         ProductResponseDTO productResponseDTO = modelMapper.map(product, ProductResponseDTO.class);
         return productResponseDTO;
     }
+
+    public ProductRequestDTO convertToRequestDTO(Product product) {
+        ProductRequestDTO productRequestDTO = modelMapper.map(product, ProductRequestDTO.class);
+        return productRequestDTO;
+    }
 }

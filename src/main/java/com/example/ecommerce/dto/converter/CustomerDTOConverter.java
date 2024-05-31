@@ -24,4 +24,9 @@ public class CustomerDTOConverter {
         CustomerResponseDTO customerResponseDTO = modelMapper.map(customer, CustomerResponseDTO.class);
         return customerResponseDTO;
     }
+
+    public CustomerRequestDTO convertToRequestDto(Customer customer) {
+        CustomerRequestDTO customerRequestDTO = modelMapper.map(customer, CustomerRequestDTO.class);
+        return customerRequestDTO;
+    }
 }
