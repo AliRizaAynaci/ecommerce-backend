@@ -17,6 +17,8 @@ import com.example.ecommerce.repository.CustomerRepository;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.interfaces.CartService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -114,10 +116,6 @@ public class CartServiceImpl implements CartService {
         return cartDTO;
     }
 
-
-
-
-
     @Override
     public CartDTO updateCartItem(Long cartId, Long productId, int quantity) {
         Cart cart = cartRepository.findById(cartId)
@@ -146,27 +144,28 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    @Transactional
     public void emptyCart(Long cartId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartNotFoundException("Cart not found with id: " + cartId));
         cart.getCartItems().clear();
+        cart.setTotalPrice(BigDecimal.ZERO);
         cartRepository.save(cart);
     }
 
     private void recalculateTotalPrice(Cart cart) {
-        // totalPrice'ı 0 olarak başlat
-        BigDecimal totalPrice = BigDecimal.ZERO; // Başlangıç değerini sıfır yapın.
+        BigDecimal totalPrice = BigDecimal.ZERO;
 
         for (CartItem item : cart.getCartItems()) {
             if (item.getProduct() == null || item.getQuantity() == 0) {
-                continue; // Null veya 0 quantity olan öğeleri atla
+                continue;
             }
 
             BigDecimal itemPrice = item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             totalPrice = totalPrice.add(itemPrice);
         }
 
-        cart.setTotalPrice(totalPrice); // Hesaplanan toplam fiyatı setetle
+        cart.setTotalPrice(totalPrice);
     }
 
 

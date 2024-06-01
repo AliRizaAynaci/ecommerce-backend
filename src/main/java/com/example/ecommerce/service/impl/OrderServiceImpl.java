@@ -30,17 +30,17 @@ public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-    private final OrderDTOConverter orderConverter;
+    private final OrderDTOConverter orderDTOConverter;
     private final CartService cartService;
 
     public OrderServiceImpl(OrderRepository orderRepository, CartRepository cartRepository,
                             CustomerRepository customerRepository, ProductRepository productRepository,
-                            OrderDTOConverter orderConverter, CartService cartService) {
+                            OrderDTOConverter orderDTOConverter, CartService cartService) {
         this.orderRepository = orderRepository;
         this.cartRepository = cartRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
-        this.orderConverter = orderConverter;
+        this.orderDTOConverter = orderDTOConverter;
         this.cartService = cartService;
     }
 
@@ -52,16 +52,16 @@ public class OrderServiceImpl implements OrderService {
 
         Customer customer = cart.getCustomer();
         if (customer == null) {
-            throw new CustomerNotFoundException("Cart not found");
+            throw new CustomerNotFoundException("Customer not found");
         }
 
         Order order = new Order();
         order.setCustomer(customer);
         order.setOrderDate(LocalDateTime.now());
         order.setStatus(OrderType.PENDING);
+        order.setTotalPrice(cart.getTotalPrice());
 
         List<OrderItem> orderItems = new ArrayList<>();
-        BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (CartItem cartItem : cart.getCartItems()) {
             Product product = cartItem.getProduct();
@@ -77,27 +77,24 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setPriceAtPurchase(product.getPrice());
             orderItems.add(orderItem);
 
-            totalAmount = totalAmount.add(product.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
-
-            product.setStock(product.getStock() - cartItem.getQuantity());
-
             productRepository.save(product);
         }
 
         order.setOrderItems(orderItems);
-        order.setTotalPrice(totalAmount);
 
         Order savedOrder = orderRepository.save(order);
 
         cartService.emptyCart(cartId);
-        return orderConverter.convertToDto(savedOrder);
+
+        return orderDTOConverter.convertToDto(savedOrder);
     }
+
 
     @Override
     public OrderResponseDTO getorderForCode(String orderCode) {
         Order order = orderRepository.findByOrderCode(orderCode)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with order code: " + orderCode));
-        return orderConverter.convertToDto(order);
+        return orderDTOConverter.convertToDto(order);
     }
 
     @Override
@@ -108,7 +105,7 @@ public class OrderServiceImpl implements OrderService {
         }
         List<Order> orders = customer.get().getOrders();
         return orders.stream()
-                .map(orderConverter::convertToDto)
+                .map(orderDTOConverter::convertToDto)
                 .collect(Collectors.toList());
     }
 }

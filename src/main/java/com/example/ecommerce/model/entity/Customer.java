@@ -1,13 +1,8 @@
 package com.example.ecommerce.model.entity;
 
 import com.example.ecommerce.model.abstracts.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -30,6 +25,6 @@ public class Customer extends BaseEntity {
     @OneToOne(mappedBy = "customer")
     private Cart cart;
 
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Order> orders;
 }
