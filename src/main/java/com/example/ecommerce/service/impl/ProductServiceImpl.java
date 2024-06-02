@@ -4,7 +4,7 @@ import com.example.ecommerce.dto.request.ProductRequestDTO;
 import com.example.ecommerce.dto.response.ProductResponseDTO;
 import com.example.ecommerce.dto.converter.ProductDTOConverter;
 import com.example.ecommerce.exception.ProductNotFoundException;
-import com.example.ecommerce.exception.StockCannotBeNegativeException;
+import com.example.ecommerce.exception.StockNotEnough;
 import com.example.ecommerce.model.entity.Product;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.interfaces.ProductService;
@@ -71,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
             productRepository.deleteById(id);
         }
         else if (product.getStock() < 0) {
-            throw new StockCannotBeNegativeException();
+            throw new StockNotEnough();
         }
         productRepository.save(product);
     }

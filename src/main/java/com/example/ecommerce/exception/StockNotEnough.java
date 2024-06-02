@@ -1,8 +1,8 @@
 package com.example.ecommerce.exception;
 
-public class StockCannotBeNegativeException extends RuntimeException {
+public class StockNotEnough extends RuntimeException {
 
-    public StockCannotBeNegativeException() {
+    public StockNotEnough() {
         super("Product cannot be sold because there is not enough stock");
     }
 

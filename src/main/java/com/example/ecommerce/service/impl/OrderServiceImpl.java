@@ -5,6 +5,7 @@ import com.example.ecommerce.dto.response.OrderResponseDTO;
 import com.example.ecommerce.exception.CartNotFoundException;
 import com.example.ecommerce.exception.CustomerNotFoundException;
 import com.example.ecommerce.exception.OrderNotFoundException;
+import com.example.ecommerce.exception.StockNotEnough;
 import com.example.ecommerce.model.entity.*;
 import com.example.ecommerce.model.enums.OrderType;
 import com.example.ecommerce.repository.CartRepository;
@@ -16,7 +17,6 @@ import com.example.ecommerce.service.interfaces.OrderService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +67,7 @@ public class OrderServiceImpl implements OrderService {
             Product product = cartItem.getProduct();
 
             if (cartItem.getQuantity() > product.getStock()) {
-                throw new IllegalArgumentException("Insufficient stock for product: " + product.getName());
+                throw new StockNotEnough();
             }
 
             OrderItem orderItem = new OrderItem();
@@ -76,6 +76,8 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPriceAtPurchase(product.getPrice());
             orderItems.add(orderItem);
+
+            product.setStock(product.getStock() - cartItem.getQuantity());
 
             productRepository.save(product);
         }

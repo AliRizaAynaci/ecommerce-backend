@@ -8,6 +8,7 @@ import com.example.ecommerce.dto.response.CartItemDTO;
 import com.example.ecommerce.exception.CartNotFoundException;
 import com.example.ecommerce.exception.CustomerNotFoundException;
 import com.example.ecommerce.exception.ProductNotFoundException;
+import com.example.ecommerce.exception.StockNotEnough;
 import com.example.ecommerce.model.entity.Cart;
 import com.example.ecommerce.model.entity.CartItem;
 import com.example.ecommerce.model.entity.Customer;
@@ -17,7 +18,6 @@ import com.example.ecommerce.repository.CustomerRepository;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.interfaces.CartService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -71,7 +71,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartDTO addItemToCart(Long customerId, Long productId) {
+    public CartDTO addItemToCart(Long customerId, Long productId, int quantity) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + customerId));
 
@@ -83,26 +83,35 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(productId));
 
-
         boolean itemExists = cart.getCartItems().stream()
                 .anyMatch(item -> item.getProduct() != null && item.getProduct().getId().equals(productId));
 
+
         CartItem cartItem;
         if (!itemExists) {
+            if (product.getStock() < quantity) {
+                throw new StockNotEnough();
+            }
+
             cartItem = new CartItem();
             cartItem.setCart(cart);
             cartItem.setProduct(product);
-            cartItem.setQuantity(1);
+            cartItem.setQuantity(quantity);
             cart.getCartItems().add(cartItem);
         } else {
             CartItem existingItem = cart.getCartItems().stream()
                     .filter(item -> item.getProduct() != null && item.getProduct().getId().equals(productId))
                     .findFirst()
                     .get();
-            existingItem.setQuantity(existingItem.getQuantity() + 1);
+
+            if (product.getStock() < existingItem.getQuantity() + quantity) {
+                throw new StockNotEnough();
+            }
+
+            existingItem.setQuantity(existingItem.getQuantity() + quantity);
         }
 
-        recalculateTotalPrice(cart); // Toplam fiyatı yeniden hesapla
+        recalculateTotalPrice(cart);
 
         cartRepository.save(cart);
 

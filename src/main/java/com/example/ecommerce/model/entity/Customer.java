@@ -3,7 +3,6 @@ package com.example.ecommerce.model.entity;
 import com.example.ecommerce.model.abstracts.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Data;
-
 import java.util.List;
 
 @Data
