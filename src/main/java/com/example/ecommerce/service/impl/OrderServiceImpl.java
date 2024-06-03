@@ -50,6 +50,11 @@ public class OrderServiceImpl implements OrderService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new CartNotFoundException("Cart not found"));
 
+
+        if (cart.getCartItems() == null || cart.getCartItems().isEmpty()) {
+            throw new RuntimeException("Cart is empty");
+        }
+
         Customer customer = cart.getCustomer();
         if (customer == null) {
             throw new CustomerNotFoundException("Customer not found");
@@ -101,11 +106,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponseDTO> getAllOrdersForCustomer(Long customerId) {
-        Optional<Customer> customer = customerRepository.findById(customerId);
-        if (customer == null) {
-            throw new CustomerNotFoundException("Customer not found with id: " + customerId);
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + customerId));
+
+        List<Order> orders = customer.getOrders();
+
+        if (orders == null) {
+            return new ArrayList<>();
         }
-        List<Order> orders = customer.get().getOrders();
+
         return orders.stream()
                 .map(orderDTOConverter::convertToDto)
                 .collect(Collectors.toList());
