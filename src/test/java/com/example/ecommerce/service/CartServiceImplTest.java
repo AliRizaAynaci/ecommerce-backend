@@ -122,7 +122,7 @@ public class CartServiceImplTest {
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         product.setStock(10);
-        product.setPrice(BigDecimal.valueOf(100.00)); // Initialize product price
+        product.setPrice(BigDecimal.valueOf(100.00));
         customer.setCart(cart);
 
         // Initialize the cartItems list
@@ -199,8 +199,8 @@ public class CartServiceImplTest {
 
     @Test
     void updateCartItem_productNotFound_throwProductNotFoundException() {
-        List<CartItem> cartItems = new ArrayList<>(); // Initialize cartItems
-        cart.setCartItems(cartItems); // Set it in the cart object
+        List<CartItem> cartItems = new ArrayList<>();
+        cart.setCartItems(cartItems);
 
         when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
 
@@ -210,7 +210,7 @@ public class CartServiceImplTest {
     @Test
     void removeItemFromCart_cartAndProductExist_itemRemoved() {
         Product product = new Product();
-        product.setId(1L); // Ensure product ID is set
+        product.setId(1L);
 
         CartItem cartItem = new CartItem();
         cartItem.setProduct(product);

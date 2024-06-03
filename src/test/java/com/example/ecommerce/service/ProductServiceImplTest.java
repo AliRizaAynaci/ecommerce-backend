@@ -82,7 +82,7 @@ public class ProductServiceImplTest {
         ProductResponseDTO result = productService.createProduct(productRequestDTO);
 
         assertNotNull(result);
-        assertEquals(1, product.getStock()); // Initial stock is 1
+        assertEquals(1, product.getStock());
         verify(productRepository, times(1)).save(product);
     }
 
@@ -95,7 +95,7 @@ public class ProductServiceImplTest {
         ProductResponseDTO result = productService.createProduct(productRequestDTO);
 
         assertNotNull(result);
-        assertEquals(6, product.getStock()); // Stock increased by 1
+        assertEquals(6, product.getStock());
         verify(productRepository, times(1)).save(product);
     }
 
@@ -122,9 +122,9 @@ public class ProductServiceImplTest {
 
         productService.deleteProduct(1L);
 
-        assertEquals(4, product.getStock()); // Stock decreased by 1
+        assertEquals(4, product.getStock());
         verify(productRepository, times(1)).save(product);
-        verify(productRepository, never()).deleteById(anyLong()); // Shouldn't delete
+        verify(productRepository, never()).deleteById(anyLong());
     }
 
     @Test
@@ -134,8 +134,8 @@ public class ProductServiceImplTest {
 
         productService.deleteProduct(1L);
 
-        assertEquals(0, product.getStock()); // Stock should be 0
-        verify(productRepository, times(1)).deleteById(1L); // Should delete
+        assertEquals(0, product.getStock());
+        verify(productRepository, times(1)).deleteById(1L);
     }
 
     @Test
