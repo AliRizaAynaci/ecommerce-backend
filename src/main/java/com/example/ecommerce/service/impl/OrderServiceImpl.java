@@ -15,6 +15,7 @@ import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.interfaces.CartService;
 import com.example.ecommerce.service.interfaces.OrderService;
 import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -88,6 +89,8 @@ public class OrderServiceImpl implements OrderService {
         }
 
         order.setOrderItems(orderItems);
+        String orderCode = generateUniqueOrderCode();
+        order.setOrderCode(orderCode);
 
         Order savedOrder = orderRepository.save(order);
 
@@ -118,5 +121,13 @@ public class OrderServiceImpl implements OrderService {
         return orders.stream()
                 .map(orderDTOConverter::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    private String generateUniqueOrderCode() {
+        String orderCode;
+        do {
+            orderCode = RandomStringUtils.randomAlphanumeric(8).toUpperCase();
+        } while (orderRepository.findByOrderCode(orderCode).isPresent()); // Check uniqueness
+        return orderCode;
     }
 }

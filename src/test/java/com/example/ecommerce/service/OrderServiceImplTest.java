@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -99,7 +101,7 @@ public class OrderServiceImplTest {
 
         assertNotNull(result);
         verify(cartService).emptyCart(1L);
-        verify(productRepository).save(product); // Stock should be updated
+        verify(productRepository).save(product);
     }
 
     @Test
@@ -110,14 +112,14 @@ public class OrderServiceImplTest {
 
     @Test
     void placeOrder_customerNotFound_throwsCustomerNotFoundException() {
-        cart.setCustomer(null); // Simulate no customer associated with the cart
+        cart.setCustomer(null);
         when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
         assertThrows(CustomerNotFoundException.class, () -> orderService.placeOrder(1L));
     }
 
     @Test
     void placeOrder_stockNotEnough_throwsStockNotEnoughException() {
-        product.setStock(1); // Insufficient stock
+        product.setStock(1);
         when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
         assertThrows(StockNotEnough.class, () -> orderService.placeOrder(1L));
     }
@@ -136,7 +138,6 @@ public class OrderServiceImplTest {
 
     @Test
     void placeOrder_multipleProducts_orderCreatedSuccessfully() {
-        // İkinci bir ürün ekleyelim
         Product product2 = new Product();
         product2.setId(2L);
         product2.setStock(3);
@@ -156,7 +157,6 @@ public class OrderServiceImplTest {
         assertNotNull(result);
         verify(cartService).emptyCart(1L);
 
-        // Her iki ürünün de stoklarının güncellendiğini doğrula
         verify(productRepository).save(product);
         verify(productRepository).save(product2);
     }
