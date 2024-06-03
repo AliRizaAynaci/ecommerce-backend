@@ -61,9 +61,6 @@ public class CustomerServiceImplTest {
         customerRequestDTO.setEmail("john.doe");
         customerRequestDTO.setPhoneNumber("+1234567890");
 
-        when(customerService.addCustomer(customerRequestDTO))
-                .thenThrow(new InvalidEmailException("Invalid email format: " + customerRequestDTO.getEmail()));
-
         assertThrows(InvalidEmailException.class, () -> customerService.addCustomer(customerRequestDTO));
     }
 
@@ -72,12 +69,9 @@ public class CustomerServiceImplTest {
         CustomerRequestDTO customerRequestDTO = new CustomerRequestDTO();
         customerRequestDTO.setFirstName("John");
         customerRequestDTO.setLastName("Doe");
-        customerRequestDTO.setEmail("john.doe@.com");
+        customerRequestDTO.setEmail("john.doe@gmail.com");
         customerRequestDTO.setPhoneNumber("invalid phone number");
 
-        when(customerService.addCustomer(customerRequestDTO))
-                .thenThrow(new InvalidPhoneNumberException(
-                        "Invalid phone number format: " + customerRequestDTO.getPhoneNumber())
-                );
+        assertThrows(InvalidPhoneNumberException.class, () -> customerService.addCustomer(customerRequestDTO));
     }
 }
