@@ -4,6 +4,7 @@ import com.example.ecommerce.dto.request.ProductRequestDTO;
 import com.example.ecommerce.dto.response.ProductResponseDTO;
 import com.example.ecommerce.model.entity.Product;
 import com.example.ecommerce.service.interfaces.ProductService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +21,10 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProduct(@PathVariable Long id) {
+    @Cacheable(value = "products", key = "#id")
+    public Product getProduct(@PathVariable Long id) {
         Product product = productService.getProduct(id);
-        return ResponseEntity.ok(product);
+        return product;
     }
 
     @PostMapping

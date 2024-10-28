@@ -6,12 +6,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Data
 @Entity
 @JsonSerialize(as = Product.class)
-public class Product extends BaseEntity {
+public class Product extends BaseEntity implements Serializable {
 
     @Column(name = "name")
     private String name;
