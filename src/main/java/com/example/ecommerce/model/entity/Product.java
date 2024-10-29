@@ -11,8 +11,7 @@ import java.math.BigDecimal;
 
 @Data
 @Entity
-@JsonSerialize(as = Product.class)
-public class Product extends BaseEntity implements Serializable {
+public class Product extends BaseEntity {
 
     @Column(name = "name")
     private String name;

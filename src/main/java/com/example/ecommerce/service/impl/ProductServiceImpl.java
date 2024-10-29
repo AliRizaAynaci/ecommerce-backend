@@ -8,8 +8,12 @@ import com.example.ecommerce.exception.StockNotEnough;
 import com.example.ecommerce.model.entity.Product;
 import com.example.ecommerce.repository.ProductRepository;
 import com.example.ecommerce.service.interfaces.ProductService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,13 +28,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product getProduct(Long id) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException(id));
-        return product;
+    @Cacheable(value = "products", key = "#root.methodName", unless = "#result == null")
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
     @Override
+    @Cacheable(cacheNames = "product_id", key = "#root.methodName + #id", unless = "#result == null")
+    public Product getProductById(Long id) {
+        return productRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    @CacheEvict(value = {"products", "product_id"}, allEntries = true)
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         // Check if the product already exists in the database
         Optional<Product> existingProduct = productRepository.findByName(productRequestDTO.getName());
@@ -51,6 +61,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CachePut(cacheNames = "product_id", key = "'getProductById' + #id", unless = "#result == null")
+    @CacheEvict(value = {"products", "product_id"}, allEntries = true)
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO updatedProductRequestDTO) {
         return productRepository.findById(id)
                 .map(product -> {
@@ -63,17 +75,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @CacheEvict(value = {"products", "product_id"}, allEntries = true)
     public void deleteProduct(Long id) {
-        Product product = getProduct(id);
-        product.setStock(product.getStock() - 1);
-
-        if (product.getStock() == 0) {
-            productRepository.deleteById(id);
-        }
-        else if (product.getStock() < 0) {
-            throw new StockNotEnough();
-        }
-        productRepository.save(product);
+        productRepository.deleteById(id);
     }
 
 }

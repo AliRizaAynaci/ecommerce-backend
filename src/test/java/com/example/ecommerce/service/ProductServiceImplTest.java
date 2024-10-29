@@ -56,20 +56,20 @@ public class ProductServiceImplTest {
     }
 
     @Test
-    void getProduct_productExists_returnsProduct() {
+    void getProductById_productExists_returnsProduct() {
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
 
-        Product result = productService.getProduct(1L);
+        Product result = productService.getProductById(1L);
 
         assertNotNull(result);
         assertEquals(product, result);
     }
 
     @Test
-    void getProduct_productNotFound_throwsProductNotFoundException() {
+    void getProductById_productNotFound_throwsProductNotFoundException() {
         when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ProductNotFoundException.class, () -> productService.getProduct(1L));
+        assertThrows(ProductNotFoundException.class, () -> productService.getProductById(1L));
     }
 
     @Test
