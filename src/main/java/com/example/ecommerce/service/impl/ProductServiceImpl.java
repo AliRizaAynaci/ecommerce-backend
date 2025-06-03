@@ -36,7 +36,8 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Cacheable(cacheNames = "product_id", key = "#root.methodName + #id", unless = "#result == null")
     public Product getProductById(Long id) {
-        return productRepository.findById(id).orElse(null);
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     @Override
@@ -77,7 +78,19 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @CacheEvict(value = {"products", "product_id"}, allEntries = true)
     public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+
+        if (product.getStock() == null || product.getStock() < 0) {
+            throw new StockNotEnough();
+        }
+
+        if (product.getStock() > 1) {
+            product.setStock(product.getStock() - 1);
+            productRepository.save(product);
+        } else {
+            productRepository.deleteById(id);
+        }
     }
 
 }
